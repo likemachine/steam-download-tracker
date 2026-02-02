@@ -32,6 +32,19 @@ def find_steam(key=KEY, subkey_path=SUBKEY_PATH, value_name=VALUE_NAME):
         print(f"Ошибка доступа к регистру: {e}")
         return None
 
+def get_app_name_from_manifest(app_id):
+    manifest_path = os.path.join(find_steam(), f"steamapps/appmanifest_{app_id}.acf")
+    try:
+        with open(manifest_path, "r", encoding="utf-8", errors="ignore") as manifest:
+            manifest_lines = manifest.readlines()
+            for line in manifest_lines:
+                match_id = RE_APP_NAME.search(line)
+                if match_id:
+                    return match_id.group(1) if match_id else None
+    except Exception as e:
+        #print(f"Ошибка при чтении манифеста: {e}")
+        return None
+
 def steam_log(path):
     print('Скрипт запущен!')
 
@@ -111,21 +124,6 @@ def read_logs(logs):
         if match_dspeed and app_id:
             dspeed = match_dspeed.group(1)
     return dspeed
-    
-
-def get_app_name_from_manifest(app_id):
-    manifest_path = os.path.join(find_steam(), f"steamapps/appmanifest_{app_id}.acf")
-    try:
-        with open(manifest_path, "r", encoding="utf-8", errors="ignore") as manifest:
-            manifest_lines = manifest.readlines()
-            for line in manifest_lines:
-                match_id = RE_APP_NAME.search(line)
-                if match_id:
-                    return match_id.group(1) if match_id else None
-    except Exception as e:
-        #print(f"Ошибка при чтении манифеста: {e}")
-        return None
-
 
 if __name__ == "__main__":
     steam_path = find_steam()
